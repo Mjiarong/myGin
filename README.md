@@ -32,7 +32,9 @@ func main() {
 			c.Writer.Write([]byte("首页"))
 		})
 		defaultRouters.GET("/news", func(c *myGin.Context) {
-			c.Writer.Write([]byte("新闻"))
+			c.JSON(200, myGin.H{
+				"message": "这是新闻首页",
+			})
 		})
 	}
 
