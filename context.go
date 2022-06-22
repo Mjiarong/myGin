@@ -51,3 +51,43 @@ func (c *Context) Abort() {
 func (c *Context) IsAborted() bool {
 	return c.index >= abortIndex
 }
+
+//通过 c.Render() 这个渲染的通用方法来适配不同的渲染器
+func (c *Context) Render(code int, r Render) {
+	//c.Writer.WriteHeader(code)
+
+	if !checkStatus(code) {
+		r.WriteContentType(c.Writer)
+		c.Writer.WriteHeaderNow()
+		return
+	}
+
+	if err := r.Render(c.Writer); err != nil {
+		panic(err)
+	}
+}
+
+// checkStatus is a copy of http.bodyAllowedForStatus non-exported function.
+func checkStatus(status int) bool {
+	switch {
+	case status >= 100 && status <= 199:
+		return false
+	case status == http.StatusNoContent:
+		return false
+	case status == http.StatusNotModified:
+		return false
+	}
+	return true
+}
+
+/*
+// String 将给定字符串写入到响应体中。
+func (c *Context) String(code int, format string, values ...interface{}) {
+	c.Render(code, render.String{Format: format, Data: values})
+}*/
+
+// JSON 将给定结构序列化为 JSON 到响应主中。
+// 将 Content-Type 设置为 “application/json” 。
+func (c *Context) JSON(code int, obj interface{}) {
+	c.Render(code, JSON{Data: obj})
+}

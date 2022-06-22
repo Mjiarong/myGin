@@ -17,4 +17,4 @@ func joinPaths(absolutePath, relativePath string) string {
 	return finalPath
 }
 
-
+type H map[string]interface{}

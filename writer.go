@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+const (
+	noWritten     = -1
+)
+
 //封装http.ResponseWriter接口，该接口在http中被实现response
 type ResponseWriter interface {
 	http.ResponseWriter
@@ -15,6 +19,9 @@ type ResponseWriter interface {
 
 	// get the http.Pusher for server push
 	Pusher() http.Pusher
+
+	// 强制写入http header(status code + headers).
+	WriteHeaderNow()
 }
 
 //构建一个实现ResponseWriter的结构体类型
@@ -47,4 +54,15 @@ func (r *R) Pusher() (pusher http.Pusher) {
 
 func (r *R) reset(writer http.ResponseWriter) {
 	r.ResponseWriter = writer
+}
+
+func (r *R) Written() bool {
+	return r.size != noWritten
+}
+
+func (r *R) WriteHeaderNow() {
+	if !r.Written() {
+		r.size = 0
+		r.ResponseWriter.WriteHeader(r.status)
+	}
 }

@@ -73,7 +73,6 @@ func (engine *Engine) handleHTTPRequest(c *Context) {
 		if ok {
 			c.handlers = handler
 			c.Next()
-			c.writermen.ResponseWriter.WriteHeader(http.StatusOK)
 			return
 		}
 	}
