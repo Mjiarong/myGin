@@ -3,9 +3,11 @@ package myGin
 import (
 	"math"
 	"net/http"
+	"net/url"
 )
 
 const abortIndex int8 = math.MaxInt8 / 2
+
 
 //封装Request、ResponseWriter
 type Context struct{
@@ -21,6 +23,8 @@ type Context struct{
 
 	handlers HandlersChain
 	index    int8
+
+	queryCache url.Values
 }
 
 var _ ResponseWriter = &R{}
@@ -90,4 +94,38 @@ func (c *Context) String(code int, format string, values ...interface{}) {
 // 将 Content-Type 设置为 “application/json” 。
 func (c *Context) JSON(code int, obj interface{}) {
 	c.Render(code, JSON{Data: obj})
+}
+
+// Query returns the keyed url query value if it exists,
+// otherwise it returns an empty string `("")`.
+func (c *Context) Query(key string) string {
+	value, _ := c.GetQuery(key)
+	return value
+}
+
+func (c *Context) GetQuery(key string) (string, bool) {
+	if values, ok := c.GetQueryArray(key); ok {
+		return values[0], ok
+	}
+	return "", false
+}
+
+// GetQueryArray returns a slice of strings for a given query key, plus
+// a boolean value whether at least one value exists for the given key.
+func (c *Context) GetQueryArray(key string) ([]string, bool) {
+	c.initQueryCache()
+	if values, ok := c.queryCache[key]; ok && len(values) > 0 {
+		return values, true
+	}
+	return []string{}, false
+}
+
+func (c *Context) initQueryCache() {
+	if c.queryCache == nil {
+		if c.Request != nil {
+			c.queryCache = c.Request.URL.Query()
+		} else {
+			c.queryCache = url.Values{}
+		}
+	}
 }
