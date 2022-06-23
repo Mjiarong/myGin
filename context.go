@@ -80,11 +80,11 @@ func checkStatus(status int) bool {
 	return true
 }
 
-/*
+
 // String 将给定字符串写入到响应体中。
 func (c *Context) String(code int, format string, values ...interface{}) {
-	c.Render(code, render.String{Format: format, Data: values})
-}*/
+	c.Render(code, String{Format: format, Data: values})
+}
 
 // JSON 将给定结构序列化为 JSON 到响应主中。
 // 将 Content-Type 设置为 “application/json” 。
