@@ -47,7 +47,7 @@ func main() {
 			fmt.Println("end middle2")
 		})
 		apiRouters.GET("/", func(c *myGin.Context) {
-			c.Writer.Write([]byte("我是一个api接口"))
+			c.String(200,"我是一个api接口")
 		})
 		apiRouters.GET("/userlist", func(c *myGin.Context) {
 			c.Writer.Write([]byte("我是一个api接口-userlist"))
